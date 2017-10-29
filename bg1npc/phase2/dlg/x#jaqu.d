@@ -6,9 +6,9 @@ BEGIN X#MARETH
 /* Add into Seniyad's Dialogue the options to  start the quest  */
 ADD_STATE_TRIGGER ~%tutu_var%SENIYA~ 2 ~Global("X#JaheiraQuest","GLOBAL",0)~
 
-ADD_TRANS_TRIGGER ~%tutu_var%SENIYA~ 1 ~OR(2) !InParty("jaheira") Dead("jaheira")~
-ADD_TRANS_TRIGGER ~%tutu_var%SENIYA~ 2 ~OR(2) !InParty("jaheira") Dead("jaheira")~
-ADD_TRANS_TRIGGER ~%tutu_var%SENIYA~ 6 ~OR(2) !InParty("jaheira") Dead("jaheira")~
+//ADD_TRANS_TRIGGER ~%tutu_var%SENIYA~ 1 ~OR(2) !InParty("jaheira") Dead("jaheira")~
+//ADD_TRANS_TRIGGER ~%tutu_var%SENIYA~ 2 ~OR(2) !InParty("jaheira") Dead("jaheira")~
+//ADD_TRANS_TRIGGER ~%tutu_var%SENIYA~ 6 ~OR(2) !InParty("jaheira") Dead("jaheira")~
 
 EXTEND_BOTTOM ~%tutu_var%SENIYA~ 1
 IF ~InParty("jaheira") InMyArea("jaheira") !StateCheck("jaheira",CD_STATE_NOTVALID) !Dead("aldeth")~ THEN DO ~SetGlobal("X#JaheiraQuest","GLOBAL",1) EndCutSceneMode()~ EXTERN ~%JAHEIRA_JOINED%~ JaheiraMakePeace
@@ -217,9 +217,10 @@ Nothing happens again until the party goes to %CloakwoodWyverns%, P#FW1700. Then
 
 /* Covering Amaranth if the Party goes through Tree Fort before Beador, or after */
 /* adding Amaranth recognition of quest. Entirety plays out only if Jaheira is there and Quest has started. */
-ADD_TRANS_TRIGGER ~%tutu_var%AMARAN~ 4 ~Global("X#JaheiraQuest","GLOBAL",0)~
-
-ADD_TRANS_TRIGGER ~%tutu_var%AMARAN~ 5 ~Global("X#JaheiraQuest","GLOBAL",0)~
+// Adding this trigger creates the possibility of Amarande having no valid dialog state (if Jaheira is in the party but unavailable for dialogue).
+//ADD_TRANS_TRIGGER ~%tutu_var%AMARAN~ 4 ~Global("X#JaheiraQuest","GLOBAL",0)~
+//
+//ADD_TRANS_TRIGGER ~%tutu_var%AMARAN~ 5 ~Global("X#JaheiraQuest","GLOBAL",0)~
 
 EXTEND_BOTTOM ~%tutu_var%AMARAN~ 4
 IF ~InParty("jaheira") InMyArea("jaheira") !StateCheck("jaheira",CD_STATE_NOTVALID) GlobalGT("X#JaheiraQuest","GLOBAL",0) Global("X#AmarantheAndarthe","GLOBAL",0)~ THEN DO ~SetGlobal("X#AmarantheAndarthe","GLOBAL",1)~ GOTO JQTreeHouse
@@ -477,8 +478,8 @@ APPEND X#ANDART
 /* Andarthe tries to surrender if below 50 percent HP and still alive */
 IF WEIGHT #-2 ~Global("X#AndSurrender","GLOBAL",1)~ THEN BEGIN AndSurrender
 SAY @0
-IF ~!Dead("beador")~ THEN DO ~DestroyItem("MINHP1") SetGlobal("X#AndSurrender","GLOBAL",2)~ EXTERN ~%JAHEIRA_JOINED%~ JahAndSur1
-IF ~Dead("beador")~ THEN DO ~DestroyItem("MINHP1") SetGlobal("X#AndSurrender","GLOBAL",2)~ EXTERN ~%JAHEIRA_JOINED%~ JahAndSur2
+IF ~!Dead("beador")~ THEN DO ~SetGlobal("X#AndSurrender","GLOBAL",2) DestroyItem("MINHP1")~ EXTERN ~%JAHEIRA_JOINED%~ JahAndSur1
+IF ~Dead("beador")~ THEN DO ~SetGlobal("X#AndSurrender","GLOBAL",2) DestroyItem("MINHP1")~ EXTERN ~%JAHEIRA_JOINED%~ JahAndSur2
 END
 
 /* From Andarthe & Faldorn */
@@ -508,8 +509,8 @@ END
 CHAIN ~%JAHEIRA_JOINED%~ JahAndSur1
 @3
 END
-++ @4 DO ~ChangeEnemyAlly("andarthe",ENEMY) SetGlobal("X#AndSurrender","GLOBAL",3)~ EXIT
-++ @5 DO ~AddexperienceParty(500) SetGlobal("X#AndSurrender","GLOBAL",4) ActionOverride("andarthe",EscapeArea())~ EXTERN ~%JAHEIRA_JOINED%~ JahAndSur4
+++ @4 DO ~SetGlobal("X#AndSurrender","GLOBAL",3) ChangeEnemyAlly("andarthe",ENEMY)~ EXIT
+++ @5 DO ~SetGlobal("X#AndSurrender","GLOBAL",4) AddexperienceParty(500) ActionOverride("andarthe",EscapeArea())~ EXTERN ~%JAHEIRA_JOINED%~ JahAndSur4
 
 /* Beador was Killed surrender terms */
 CHAIN ~%JAHEIRA_JOINED%~ JahAndSur2
@@ -619,11 +620,11 @@ CHAIN ~%tutu_var%SENIYA~ SEReward1.1
 == ~%JAHEIRA_JOINED%~ @179
 == ~%tutu_var%SENIYA~ @180
 END
-IF ~~ THEN DO ~AddexperienceParty(5000) GiveItemCreate("X#JACLUB",Player1,1,1,0) SetGlobal("SeniyadXP","GLOBAL",1) EraseJournalEntry(@163) Shout(3) EscapeArea()~ SOLVED_JOURNAL @169 EXIT
+IF ~~ THEN DO ~SetGlobal("SeniyadXP","GLOBAL",1) AddexperienceParty(5000) GiveItemCreate("X#JACLUB",Player1,1,1,0) EraseJournalEntry(@163) Shout(3) EscapeArea()~ SOLVED_JOURNAL @169 EXIT
 
 CHAIN ~%tutu_var%SENIYA~ SEReward1.3
 @181
 == ~%JAHEIRA_JOINED%~ @179
 == ~%tutu_var%SENIYA~ @182
 END
-IF ~~ THEN DO ~AddexperienceParty(5000) GiveItemCreate("X#JACLUB",Player1,1,1,0) SetGlobal("SeniyadXP","GLOBAL",1) EraseJournalEntry(@163) Shout(3) EscapeArea()~ SOLVED_JOURNAL @169 EXIT
+IF ~~ THEN DO ~SetGlobal("SeniyadXP","GLOBAL",1) AddexperienceParty(5000) GiveItemCreate("X#JACLUB",Player1,1,1,0) EraseJournalEntry(@163) Shout(3) EscapeArea()~ SOLVED_JOURNAL @169 EXIT
